@@ -4,10 +4,18 @@ from bs4 import BeautifulSoup
 
 st.title("Page scraper")
 
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/111.0',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Accept-Language': 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Connection': 'keep-alive'
+}
+
 # Fonction de vérification de l'URL
 def check_url(url):
     try:
-        response = requests.get(url)
+        response = requests.get(url,headers=headers)
         if response.status_code == 200:
             return True
         else:
