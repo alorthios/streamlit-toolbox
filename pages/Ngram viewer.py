@@ -133,7 +133,6 @@ if txt != "":
     df3 = df3.rename(columns={'index':'', 0:'n-gram',1:'count'})
     right_column.dataframe(df3)
 
-    filename = 'n-gram-'+str(random.randint(1,999))+'.xlsx'
     buffer = io.BytesIO()
     with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
         df1.to_excel(writer, sheet_name='1gram')

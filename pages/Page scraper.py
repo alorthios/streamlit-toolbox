@@ -38,7 +38,7 @@ def collect_info(url):
 # Interface utilisateur
 st.header("Input")
 url = st.text_input("Enter a webpage url :")
-if st.button("Run"):
+if st.button("RUN"):
     if check_url(url):
         info_dict = collect_info(url)
         st.header("Output")
