@@ -28,13 +28,14 @@ def extract_urls_from_sitemap(url):
 
 
 def main():
-    st.title("SITEMAP XML SCRAPER")
-
+    st.title("Sitemap XML scraper")
+    st.header("Input")
     # Entrer l'url du sitemap
-    url = st.text_input("Entrez l'URL du sitemap XML")
+    url = st.text_input("Enter a sitemap XML url :")
     left_col, middle_col, right_col = st.columns(3)
     # Bouton RUN pour déclencher le processus
     if left_col.button("RUN"):
+        st.header("Output")
         # Vérifier si l'url est valide
         if not is_valid_sitemap(url):
             st.error("L'URL entrée n'est pas un sitemap XML valide")
