@@ -28,6 +28,7 @@ def extract_urls_from_sitemap(url):
 
 
 def main():
+    st.set_page_config(layout="wide")
     st.title("Sitemap XML scraper")
     st.header("Input")
     # Entrer l'url du sitemap

@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 
+st.set_page_config(layout="wide")
 st.title("Page scraper")
 
 headers = {

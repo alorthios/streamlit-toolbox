@@ -3,6 +3,7 @@ import pandas as pd
 import requests
 import io  
 
+
 # Fonction pour télécharger un dataframe au format CSV
 def download_csv(df):
     csv = df.to_csv(index=False)
@@ -28,6 +29,7 @@ def call_token(api_key):
     response = requests.get(endpoint)
     return response.text
 
+st.set_page_config(layout="wide")
 # Titre de l'application
 st.title("Semrush organic results")
 st.header("Input")
@@ -84,8 +86,8 @@ if st.button("RUN"):
     
     # Affichage du dataframe
     st.write(df_all)
-    st.write(grouped)
+    #st.write(grouped)
     #https://www.semrush.com/kb/986-api-serp-features
-    
+
 
 
