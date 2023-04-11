@@ -1,9 +1,10 @@
 import streamlit as st
 import pandas as pd
 import requests
-import io  
+import io 
+import time
 
-
+empty = []
 # Fonction pour télécharger un dataframe au format CSV
 def download_csv(df):
     csv = df.to_csv(index=False)
@@ -16,6 +17,9 @@ def call_api(api_key, phrase, database, display):
     endpoint = f"https://api.semrush.com/?type=phrase_organic&key={api_key}&phrase={phrase}&export_columns=Dn,Ur,Fk,Fp&database={database}&display_limit={display}"
     response = requests.get(endpoint)
     data = [line.split(';') for line in response.text.split('\n')]
+    if data[0][0] == "ERROR 50 :: NOTHING FOUND" :
+        empty.append(phrase)
+        return pd.DataFrame()
     df = pd.DataFrame(data[1:], columns=data[0])
     df['Position'] = range(1, len(df) + 1)
     df['Keyword'] = phrase
@@ -52,13 +56,31 @@ display = st.selectbox("Select a limit", display)
 # Bouton pour lancer l'appel à l'API
 if st.button("RUN"):
     st.header("Output")
+
+    progress_text = "Operation in progress. Please wait."
+    counter = 0
+    my_bar = st.progress(counter, text=progress_text)
+    keywords_list = keywords.split('\n')
+    tmp_list = []
+    for item in keywords_list:
+        if item not in tmp_list:
+            if item != '':
+                tmp_list.append(item)
+    keywords_list = tmp_list
+
     # Boucle sur la liste des mots clés et stockage des résultats dans une liste de dataframes
     dfs = []
-    for keyword in keywords.split('\n'):
+    dfpivot = []
+    for keyword in  keywords_list:
         df = call_api(api_key, keyword, database, display)
         dfs.append(df)
+        if df.empty == False:
+            dfpivot.append(df.pivot(index='Keyword', columns='Position', values='Domain').reset_index())
+        counter += 100/len(keywords_list)
+        my_bar.progress(int(counter), text=progress_text)
     # Concaténation des dataframes en un seul dataframe
     df_all = pd.concat(dfs)
+    df_all_pivot = pd.concat(dfpivot)
 
     # groupe les données par Domain et calcule les fréquences des positions
     grouped = df_all.groupby('Domain')['Position'].apply(lambda x: pd.Series([
@@ -72,10 +94,17 @@ if st.button("RUN"):
     # renomme les colonnes
     grouped.columns = ['Position 1', 'Position 2_3', 'Position 4_10', 'Position 11_20', 'Position 21_30', 'Position 31_100']
     grouped = grouped.sort_values(by=['Position 1'],ascending=False)
+
+    missing = pd.DataFrame (empty, columns = ['Keywords without data'])
+    kw = pd.DataFrame (keywords_list, columns = ['Keywords list'])
     buffer = io.BytesIO()
     with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+        kw.to_excel(writer, sheet_name='KEYWORDS')
+        missing.to_excel(writer, sheet_name='MISSING')  
         df_all.to_excel(writer, sheet_name='DATA')
         grouped.to_excel(writer, sheet_name='GROUP')
+        df_all_pivot.to_excel(writer, sheet_name='MATRIX')   
+    
         writer.save()
         st.download_button(
             label="Download Excel Worksheets",
@@ -87,7 +116,5 @@ if st.button("RUN"):
     # Affichage du dataframe
     st.write(df_all)
     #st.write(grouped)
+
     #https://www.semrush.com/kb/986-api-serp-features
-
-
-
