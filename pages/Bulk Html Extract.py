@@ -2,7 +2,6 @@ import requests
 import streamlit as st
 from bs4 import BeautifulSoup
 import time
-import pyperclip
 
 # Function to retrieve the content of the <article> HTML tag
 def get_article_content(url):
